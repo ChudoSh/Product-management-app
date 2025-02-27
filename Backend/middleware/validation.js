@@ -74,7 +74,7 @@ export const validateProduct = (req, res, next) => {
 
 // Validate search parameters
 export const validateSearch = (req, res, next) => {
-  const { minPrice, maxPrice } = req.query;
+  const { minPrice, maxPrice } = req.queryPool;
   const errors = [];
 
   // Price range validation

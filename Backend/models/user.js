@@ -1,6 +1,7 @@
 // models/user.js
 import bcrypt from 'bcrypt';
-import { query } from '../config/db/MySql.js';
+import { queryPool } from '../config/db/mysqlSetup.js';
+
 
 class User {
   #id;
@@ -37,8 +38,8 @@ class User {
 
   static async findByEmail(email) {
     const sql = 'SELECT * FROM users WHERE email = ?';
-    const users = await query(sql, [email]);
-    
+    const [users,_] = await queryPool(sql, [email]);
+
     if (users.length === 0) return null;
     
     const userData = users[0];
@@ -52,7 +53,7 @@ class User {
 
   static async findById(id) {
     const sql = 'SELECT * FROM users WHERE id = ?';
-    const users = await query(sql, [id]);
+    const users = await queryPool(sql, [id]);
     
     if (users.length === 0) return null;
     
@@ -70,7 +71,7 @@ class User {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
     const sql = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
-    const result = await query(sql, [name, email, hashedPassword]);
+    const result = await queryPool(sql, [name, email, hashedPassword]);
     
     return new User(result.insertId, name, email, hashedPassword);
   }

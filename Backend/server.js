@@ -3,10 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoute.js';
 import productRoutes from './routes/productRoute.js';
-import { connectMysql } from './config/db/MySql.js';
-import { connectMongo } from './config/db/MongoDB.js';
-import  setupMySQL from './utils/setupMySql.js'
-import  setupMongoDB  from './utils/setupMongoDB.js'
+import  { initializeMySql } from './config/db/mysqlSetup.js';
+import { initializeMongo } from './config/db/mongodbSetup.js';
 
 dotenv.config();
 
@@ -22,11 +20,9 @@ app.use('/api/products', productRoutes);
 
 const startServer = async () => {
   try {
-    await connectMysql();
-    await connectMongo();
 
-    await setupMySQL();
-    await setupMongoDB();
+    await initializeMySql();
+    await initializeMongo(); 
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

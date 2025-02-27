@@ -1,6 +1,6 @@
 // controllers/productController.js
 import Product from '../models/product.js';
-import { getCollection } from '../config/db/MongoDB.js';
+import { getCollection } from '../config/db/mongodbSetup.js';
 
 export const getAllProducts = async (req, res) => {
     try {
@@ -164,7 +164,7 @@ export const searchProducts = async (req, res) => {
         const { q, minPrice, maxPrice, sort } = req.query;
         const { page = 1, limit = 10 } = req.query;
         
-        // Build query filters
+        // Build queryPool filters
         const filter = Object.create(null);
         
         // Text search
@@ -195,7 +195,7 @@ export const searchProducts = async (req, res) => {
             sortOptions.created_at = -1;
         }
         
-        // Execute query with pagination
+        // Execute queryPool with pagination
         const products = await collection
             .find(filter)
             .sort(sortOptions)

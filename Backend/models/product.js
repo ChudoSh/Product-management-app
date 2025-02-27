@@ -1,6 +1,6 @@
 // models/product.js
-import { query } from '../config/db/MySql.js';
-import { getCollection } from '../config/db/MongoDB.js';
+import { queryPool } from '../config/db/mysqlSetup.js';
+import { getCollection } from '../config/db/mongodbSetup.js';
 
 class Product {
     #id;
@@ -41,10 +41,10 @@ class Product {
     static async findAll(page = 1, limit = 10) {
         const offset = (page - 1) * limit;
         const sql = 'SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?';
-        const products = await query(sql, [limit, offset]);
+        const [products, _] = await queryPool(sql, [limit, offset]);
         
         // Count total products for pagination
-        const [countResult] = await query('SELECT COUNT(*) as total FROM products');
+        const [countResult] = await queryPool('SELECT COUNT(*) as total FROM products');
         const total = countResult.total;
         
         return {
@@ -67,7 +67,7 @@ class Product {
 
     static async findById(id) {
         const sql = 'SELECT * FROM products WHERE id = ?';
-        const products = await query(sql, [id]);
+        const [products, _] = await queryPool(sql, [id]);
         
         if (products.length === 0) return null;
         
@@ -85,7 +85,7 @@ class Product {
     static async create(name, description, price) {
         // Insert into MySQL
         const sql = 'INSERT INTO products (name, description, price) VALUES (?, ?, ?)';
-        const result = await query(sql, [name, description, price]);
+        const result = await queryPool(sql, [name, description, price]);
         const id = result.insertId;
         
         // Get the created product with timestamps
@@ -100,7 +100,7 @@ class Product {
     async update() {
         // Update in MySQL
         const sql = 'UPDATE products SET name = ?, description = ?, price = ? WHERE id = ?';
-        await query(sql, [this.#name, this.#description, this.#price, this.#id]);
+        await queryPool(sql, [this.#name, this.#description, this.#price, this.#id]);
         
         // Sync with MongoDB
         await Product.syncToMongoDB(this);
@@ -111,7 +111,7 @@ class Product {
     static async delete(id) {
         // Delete from MySQL
         const sql = 'DELETE FROM products WHERE id = ?';
-        await query(sql, [id]);
+        await queryPool(sql, [id]);
         
         // Delete from MongoDB
         const collection = getCollection('products');
