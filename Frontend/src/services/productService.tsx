@@ -1,32 +1,45 @@
-// src/services/AgentService.tsx
+// src/services/productService.tsx
 import axios, { AxiosResponse } from 'axios';
-import { Agent } from '../Types/Agent';
-import productService from './productService';
+import { Product } from '../types/Product'; // You'll need to create this type
 
 const API_URL = 'http://localhost:6000/api/products';
 
+// Helper to handle auth token for protected routes
+const authHeader = () => {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 const productService = {
-    // Backend returns array of agents
-    getAll: (): Promise<AxiosResponse<Agent[]>> => axios.get(API_URL),
-    
-    // Backend returns single agent
-    getById: (id: string): Promise<AxiosResponse<Agent>> =>
-        axios.get(`${API_URL}/${id}`),
-    
-    // Backend creates and returns new agent
-    create: (): Promise<AxiosResponse<Agent>> =>
-        axios.post(API_URL),
-    
-    // These return the updated agent
-    start: (id: string): Promise<AxiosResponse<Agent>> =>
-        axios.put(`${API_URL}/${id}/start`),
-    
-    stop: (id: string): Promise<AxiosResponse<Agent>> =>
-        axios.put(`${API_URL}/${id}/stop`),
-    
-    // This returns no content (204)
-    delete: (id: string): Promise<AxiosResponse<void>> =>
-        axios.delete(`${API_URL}/${id}`),
+  // Get all products
+  getAll: (): Promise<AxiosResponse<Product[]>> => 
+    axios.get(API_URL),
+  
+  // Get product by ID
+  getById: (id: string): Promise<AxiosResponse<Product>> =>
+    axios.get(`${API_URL}/${id}`),
+  
+  // Search products
+  search: (query: string): Promise<AxiosResponse<Product[]>> =>
+    axios.get(`${API_URL}/search?q=${query}`),
+  
+  // Create product (authenticated)
+  create: (productData: Partial<Product>): Promise<AxiosResponse<Product>> =>
+    axios.post(API_URL, productData, { 
+      headers: authHeader() 
+    }),
+  
+  // Update product (authenticated)
+  update: (id: string, productData: Partial<Product>): Promise<AxiosResponse<Product>> =>
+    axios.put(`${API_URL}/${id}`, productData, { 
+      headers: authHeader() 
+    }),
+  
+  // Delete product (authenticated)
+  delete: (id: string): Promise<AxiosResponse<void>> =>
+    axios.delete(`${API_URL}/${id}`, { 
+      headers: authHeader() 
+    }),
 };
 
 export default productService;

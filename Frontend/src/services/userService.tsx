@@ -1,19 +1,30 @@
-// src/services/AgentService.tsx
+// src/services/userService.tsx
 import axios, { AxiosResponse } from 'axios';
-import { Agent } from '../Types/Agent';
-import productService from './productService';
+import { User } from '../types/User'; // You'll need to create this type
 
-const API_URL = 'http://localhost:6000/api/products';
+const API_URL = 'http://localhost:6000/api/users';
 
-const productService = {
-    // Backend returns array of agents
-    register: (name: string, email:string, password: string): 
-        Promise<AxiosResponse> => axios.get(API_URL),
-    
-    // Backend returns single agent
-    login: (id: string): Promise<AxiosResponse<Agent>> =>
-        axios.get(`${API_URL}/${id}`),
-    
+const userService = {
+  // Register new user
+  register: (name: string, email: string, password: string): Promise<AxiosResponse> => 
+    axios.post(`${API_URL}/register`, { name, email, password }),
+  
+  // Login user
+  login: (email: string, password: string): Promise<AxiosResponse> => 
+    axios.post(`${API_URL}/login`, { email, password }),
+  
+  // Get user profile (authenticated)
+  getProfile: (): Promise<AxiosResponse<User>> => {
+    const token = localStorage.getItem('token');
+    return axios.get(`${API_URL}/profile`, { 
+      headers: { Authorization: `Bearer ${token}` } 
+    });
+  },
+  
+  // Logout (client-side only)
+  logout: (): void => {
+    localStorage.removeItem('token');
+  }
 };
 
-export default productService;
+export default userService;
