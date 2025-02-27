@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Front for Gigsberg task",
+  "main": "app.tsx",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "keywords": [
+    "frontend"
+  ],
+  "author": "bar",
+  "license": "ISC"
+}
