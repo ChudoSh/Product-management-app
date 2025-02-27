@@ -1,3 +1,4 @@
+*/.env
 Backend/node_modules/.package-lock.json
 Backend/node_modules/.bin/mime
 Backend/node_modules/.bin/node
