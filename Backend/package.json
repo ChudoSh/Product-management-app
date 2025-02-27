@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "The backend service for Node Task",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm run test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChudoSh/NodeTask.git"
+  },
+  "keywords": [
+    "backend"
+  ],
+  "author": "Bar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChudoSh/NodeTask/issues"
+  },
+  "homepage": "https://github.com/ChudoSh/NodeTask#readme",
+  "dependencies": {
+    "express":"4.21.2",
+    "mysql": "^2.18.1"
+
+
+  }
+}
