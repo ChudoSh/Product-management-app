@@ -1,19 +1,20 @@
 import fs from 'fs';
 import path from 'path';
 import { query } from '../config/db/MySql.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const setupDatabase = async () => {
   try {
-    // Read and execute Database.sql
     const databaseSQL = fs.readFileSync(
-      path.resolve('Database/Schemas/Database.sql'), 
+      path.resolve(process.env.DATABASE_SQL), 
       'utf8'
     );
     await query(databaseSQL, []);
     
-    // Read and execute Tables.sql
     const tablesSQL = fs.readFileSync(
-      path.resolve('Database/Schemas/Tables.sql'), 
+      path.resolve(process.env.TABLES_SQL), 
       'utf8'
     );
     await query(tablesSQL, []);
