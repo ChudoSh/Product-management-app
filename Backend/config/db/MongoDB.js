@@ -18,6 +18,15 @@ const connectMongo = async () => {
   }
 };
 
+const closeMongo = async () => {
+  if (mongoClient) {
+    await mongoClient.close();
+    mongoDb = null;
+    mongoClient = null;
+    console.log('MongoDB connection closed');
+  }
+};
+
 
 const getCollection = (collectionName) => {
   if (!mongoDb) {
@@ -29,5 +38,6 @@ const getCollection = (collectionName) => {
 
 export {
   connectMongo,
+  closeMongo,
   getCollection
 };

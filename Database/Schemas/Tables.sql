@@ -1,8 +1,5 @@
 -- Users Table
-IF NOT EXISTS(SELECT * FROM sys.objects 
-              WHERE object_id = OBJECT_ID('dbo.users'))
-BEGIN
-  CREATE TABLE users (
+  CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -12,9 +9,7 @@ BEGIN
 END
 
 -- Products Table
-IF NOT EXISTS(SELECT * FROM sys.objects 
-              WHERE object_id = OBJECT_ID('dbo.products'))
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   description TEXT,
