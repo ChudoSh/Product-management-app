@@ -7,7 +7,7 @@ import {
 import { TbDeviceAnalytics } from "react-icons/tb";
 import { Gi3dGlasses } from "react-icons/gi";
 import { RiStockLine } from "react-icons/ri";
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 
 
 
@@ -35,7 +35,7 @@ const Route = ({
   path: string;
 }) => {
   return (
-    <Link href={path}>
+    <Link to={path}>
       <button
         className={`flex items-center justify-start gap-2 w-full rounded px-2 py-1.5 text-sm transition-[box-shadow,_background-color,_color] ${
           selected
