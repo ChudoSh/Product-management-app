@@ -48,7 +48,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - PORT=5001
-      - JWT_SECRET=your_secure_jwt_secret
+      - JWT_SECRET=cc973053d20cb010899da291cede623d85934e6e5758bbf8ba3395b5be06bb9b
       - JWT_EXPIRES_IN=24h
       - MYSQL_HOST=mysql
       - MYSQL_USER=user
