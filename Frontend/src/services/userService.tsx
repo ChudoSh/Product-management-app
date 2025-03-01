@@ -1,6 +1,6 @@
 // src/services/userService.tsx
 import axios, { AxiosResponse } from 'axios';
-import { User } from '../types/User'; // You'll need to create this type
+import {User} from '../types/User'; 
 
 const API_URL = 'http://localhost:6000/api/users';
 

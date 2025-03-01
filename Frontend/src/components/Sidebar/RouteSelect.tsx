@@ -1,16 +1,8 @@
-import React from "react";
 import { IconType } from "react-icons";
-import {
-  FiDollarSign,
-  FiHome
-} from "react-icons/fi";
-import { TbDeviceAnalytics } from "react-icons/tb";
+import {FiHome} from "react-icons/fi";
 import { Gi3dGlasses } from "react-icons/gi";
 import { RiStockLine } from "react-icons/ri";
 import { Link } from 'react-router-dom';
-
-
-
 
 
 export const RouteSelect = () => {

@@ -1,8 +1,9 @@
 {
-  "name": "frontend-new",
+  "name": "Frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "main.tsx",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
