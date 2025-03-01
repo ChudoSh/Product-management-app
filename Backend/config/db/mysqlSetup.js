@@ -1,5 +1,4 @@
-// config/db/MySql.js
-import mysql from 'mysql2/promise'; // Using promise version for cleaner code
+import mysql from 'mysql2/promise'; 
 import fs from 'fs'
 import path from 'path'
 import dotenv from 'dotenv'
@@ -11,7 +10,6 @@ dotenv.config();
 
 const initializeMySql = async () => {
   try {
-    // Create initial pool
     const setupPool = mysql.createPool({
       host: process.env.MYSQL_HOST,
       user: process.env.MYSQL_USER,
@@ -21,7 +19,6 @@ const initializeMySql = async () => {
     
     dbName = process.env.DATABASE_NAME;
     
-    // Create database
     await setupPool.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
 
     const tablesSQL = fs.readFileSync(
@@ -38,10 +35,8 @@ const initializeMySql = async () => {
         await setupPool.query(statement);
       }
     
-    // End setup pool connections
     await setupPool.end();
     
-    // Create application pool with database selected
     pool = mysql.createPool({
       host: process.env.MYSQL_HOST,
       user: process.env.MYSQL_USER,
@@ -66,7 +61,6 @@ const queryPool = async (sql, params = []) => {
   return pool.query(sql, params);
 };
 
-// Get existing pool or initialize
 const getPool = async () => {
   if (!pool) {
     pool = await initialize();

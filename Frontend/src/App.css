@@ -1,0 +1,26 @@
+/* src/App.css */
+.app {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #1e1e1e;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  height: 100vh;
+}
+
+.content {
+  overflow-y: auto;
+}

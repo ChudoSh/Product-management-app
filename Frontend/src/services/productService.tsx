@@ -1,45 +1,48 @@
-// src/services/productService.tsx
-import axios, { AxiosResponse } from 'axios';
-import { Product } from '../types/Product'; // You'll need to create this type
+import axios from 'axios';
 
-const API_URL = 'http://localhost:6000/api/products';
+const API_URL = import.meta.env.VITE_API_URL + '/products';
 
-// Helper to handle auth token for protected routes
-const authHeader = () => {
+const getAuthHeader = () => {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 const productService = {
-  // Get all products
-  getAll: (): Promise<AxiosResponse<Product[]>> => 
-    axios.get(API_URL),
+  getAll: async (page = 1, limit = 10) => {
+    return await axios.get(`${API_URL}?page=${page}&limit=${limit}`, { 
+      headers: getAuthHeader() 
+    });
+  },
   
-  // Get product by ID
-  getById: (id: string): Promise<AxiosResponse<Product>> =>
-    axios.get(`${API_URL}/${id}`),
+  getById: async (id) => {
+    return await axios.get(`${API_URL}/${id}`, { 
+      headers: getAuthHeader() 
+    });
+  },
   
-  // Search products
-  search: (query: string): Promise<AxiosResponse<Product[]>> =>
-    axios.get(`${API_URL}/search?q=${query}`),
+  create: async (product) => {
+    return await axios.post(API_URL, product, { 
+      headers: getAuthHeader() 
+    });
+  },
   
-  // Create product (authenticated)
-  create: (productData: Partial<Product>): Promise<AxiosResponse<Product>> =>
-    axios.post(API_URL, productData, { 
-      headers: authHeader() 
-    }),
+  update: async (id, product) => {
+    return await axios.put(`${API_URL}/${id}`, product, { 
+      headers: getAuthHeader() 
+    });
+  },
   
-  // Update product (authenticated)
-  update: (id: string, productData: Partial<Product>): Promise<AxiosResponse<Product>> =>
-    axios.put(`${API_URL}/${id}`, productData, { 
-      headers: authHeader() 
-    }),
+  delete: async (id) => {
+    return await axios.delete(`${API_URL}/${id}`, { 
+      headers: getAuthHeader() 
+    });
+  },
   
-  // Delete product (authenticated)
-  delete: (id: string): Promise<AxiosResponse<void>> =>
-    axios.delete(`${API_URL}/${id}`, { 
-      headers: authHeader() 
-    }),
+  search: async (queryParams) => {
+    return await axios.get(`${API_URL}?${queryParams}`, { 
+      headers: getAuthHeader() 
+    });
+  }
 };
 
 export default productService;

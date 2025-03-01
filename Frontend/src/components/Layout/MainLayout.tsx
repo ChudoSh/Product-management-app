@@ -1,24 +1,18 @@
-// src/components/layout/MainLayout.tsx
 import React, { ReactNode } from 'react';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import {Sidebar} from '../Sidebar/Sidebar';
 
 interface MainLayoutProps {
   children: ReactNode;
-  showSidebar?: boolean;
 }
 
-const MainLayout = ({ children, showSidebar = true }: MainLayoutProps) => {
+const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div className="app-container">
-      <Navbar />
-      <div className="content-container">
-        {showSidebar && <Sidebar />}
-        <main className="main-content">
-          {children}
-        </main>
+    <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
+      <Sidebar />
+      <div className="bg-white rounded-lg pb-4 shadow">
+        {children}
       </div>
-    </div>
+    </main>
   );
 };
 

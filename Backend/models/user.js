@@ -1,5 +1,4 @@
-// models/user.js
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { queryPool } from '../config/db/mysqlSetup.js';
 
 
@@ -73,7 +72,7 @@ class User {
     const sql = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
     const result = await queryPool(sql, [name, email, hashedPassword]);
     
-    return new User(result.insertId, name, email, hashedPassword);
+    return new User(result[0].insertId, name, email, hashedPassword);
   }
 }
 

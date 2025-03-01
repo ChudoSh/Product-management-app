@@ -1,4 +1,3 @@
-// models/product.js
 import { queryPool } from '../config/db/mysqlSetup.js';
 import { getCollection } from '../config/db/mongodbSetup.js';
 
@@ -37,15 +36,13 @@ class Product {
         };
     }
 
-    // Static methods for database operations
     static async findAll(page = 1, limit = 10) {
         const offset = (page - 1) * limit;
         const sql = 'SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?';
         const [products, _] = await queryPool(sql, [limit, offset]);
         
-        // Count total products for pagination
         const [countResult] = await queryPool('SELECT COUNT(*) as total FROM products');
-        const total = countResult.total;
+        const total = countResult[0].total;
         
         return {
             data: products.map(p => new Product(
@@ -83,44 +80,44 @@ class Product {
     }
 
     static async create(name, description, price) {
-        // Insert into MySQL
         const sql = 'INSERT INTO products (name, description, price) VALUES (?, ?, ?)';
         const result = await queryPool(sql, [name, description, price]);
-        const id = result.insertId;
+        const id = result[0].insertId;
         
-        // Get the created product with timestamps
         const product = await this.findById(id);
-        
-        // Sync with MongoDB for search
+
         await this.syncToMongoDB(product);
         
         return product;
     }
 
     async update() {
-        // Update in MySQL
         const sql = 'UPDATE products SET name = ?, description = ?, price = ? WHERE id = ?';
         await queryPool(sql, [this.#name, this.#description, this.#price, this.#id]);
         
-        // Sync with MongoDB
         await Product.syncToMongoDB(this);
         
         return this;
     }
 
     static async delete(id) {
-        // Delete from MySQL
         const sql = 'DELETE FROM products WHERE id = ?';
         await queryPool(sql, [id]);
         
-        // Delete from MongoDB
         const collection = getCollection('products');
         await collection.deleteOne({ product_id: id });
         
         return true;
     }
 
-    // Sync product to MongoDB for search functionality
+    static async clearAll() {
+        const sql = 'TRUNCATE TABLE products';
+        await queryPool(sql);
+        
+        const collection = getCollection('products');
+        await collection.deleteMany({});
+    }
+
     static async syncToMongoDB(product) {
         const collection = getCollection('products');
         
@@ -131,8 +128,7 @@ class Product {
             price: product.price,
             created_at: product.created_at,
         };
-        
-        // Upsert - update if exists, insert if not
+       
         await collection.updateOne(
             { product_id: product.id },
             { $set: mongoProduct },

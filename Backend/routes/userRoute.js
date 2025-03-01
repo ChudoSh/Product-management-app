@@ -1,12 +1,12 @@
 import express from 'express';
 import { register, login, getProfile } from '../controllers/userController.js';
 import { authenticate } from '../middleware/auth.js';
-import { validateUserRegistration } from '../middleware/validation.js';
+import { validateUserLogin, validateUserRegistration } from '../middleware/validation.js';
 
 const router = express.Router();
 
 router.post('/register', validateUserRegistration, register);
-router.post('/login', login);
+router.post('/login', validateUserLogin, login);
 
 router.get('/profile', authenticate, getProfile);
 
