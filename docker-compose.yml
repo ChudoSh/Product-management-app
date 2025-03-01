@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # MySQL database service
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: productdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./Backend/database/dbSetup.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB service
+  mongodb:
+    image: mongo:6.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: productsearch
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/productsearch --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # Backend service
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=5001
+      - JWT_SECRET=your_secure_jwt_secret
+      - JWT_EXPIRES_IN=24h
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - DATABASE_NAME=productdb
+      - MONGODB_URI=mongodb://root:rootpassword@mongodb:27017
+      - TABLES_SQL=./database/dbSetup.sql
+      - CORS_ORIGIN=http://localhost:5173
+    ports:
+      - "5001:5001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:5001/api
+      - HOST=0.0.0.0
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:

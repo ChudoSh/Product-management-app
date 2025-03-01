@@ -1,6 +1,9 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
 
-const API_URL = 'http://localhost:5001/api/products';
+dotenv.config();
+
+const API_URL = process.env.VITE_API_URL + '/products';
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('token');

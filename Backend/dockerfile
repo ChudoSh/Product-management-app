@@ -1,0 +1,20 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+
+# Install build dependencies and node modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && npm install \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . .
+
+EXPOSE 5001
+
+CMD ["npm", "start"]

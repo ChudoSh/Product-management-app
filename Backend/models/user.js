@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { queryPool } from '../config/db/mysqlSetup.js';
 
 

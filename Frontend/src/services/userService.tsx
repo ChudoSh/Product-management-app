@@ -1,7 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
 import {User} from '../types/User'; 
+import dotenv from 'dotenv'
 
-const API_URL = 'http://localhost:5001/api/users';
+dotenv.config();
+
+const API_URL = process.env.VITE_API_URL + '/users';
 
 const userService = {
   register: (name: string, email: string, password: string): Promise<AxiosResponse> => 
