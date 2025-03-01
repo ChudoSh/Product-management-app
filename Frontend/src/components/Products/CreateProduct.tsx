@@ -1,4 +1,3 @@
-// src/components/Products/CreateProduct.tsx
 import React from 'react';
 import ProductForm from './ProductForm';
 import productService from '../../services/productService';

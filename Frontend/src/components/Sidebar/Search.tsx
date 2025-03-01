@@ -1,4 +1,3 @@
-// src/components/Sidebar/Search.tsx
 import React, { useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import { CommandMenu } from "./CommandMenu";

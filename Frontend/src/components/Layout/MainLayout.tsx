@@ -1,4 +1,3 @@
-// src/components/Layout/MainLayout.tsx
 import React, { ReactNode } from 'react';
 import {Sidebar} from '../Sidebar/Sidebar';
 

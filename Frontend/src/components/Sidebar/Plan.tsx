@@ -1,4 +1,3 @@
-// src/components/Sidebar/Plan.tsx
 import React from "react";
 
 export const Plan = () => {

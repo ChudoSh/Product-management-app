@@ -1,4 +1,3 @@
-// src/components/Sidebar/AccountToggle.tsx
 import React from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";

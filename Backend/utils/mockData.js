@@ -1,6 +1,4 @@
 import Product from '../models/product.js';
-
-import { queryPool } from '../config/db/mysqlSetup.js';
 import { DatabaseError } from './errorHandler.js';
 
 const mockProducts = [
@@ -83,6 +81,7 @@ const mockProducts = [
 
 export async function insertMockProducts() {
     try {
+        await Product.clearAll();
         for (const mockProduct of mockProducts) {
             const product = await Product.create(
                 mockProduct.name, 

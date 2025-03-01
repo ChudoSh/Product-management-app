@@ -1,4 +1,3 @@
-// src/components/Sidebar/CommandMenu.tsx
 import { Command } from "cmdk";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {  FiLogOut, FiPhone, FiPlus, FiPackage, FiUser } from "react-icons/fi";
@@ -16,7 +15,6 @@ export const CommandMenu = ({
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  // Toggle the menu when ⌘K is pressed
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {

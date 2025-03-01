@@ -1,4 +1,3 @@
-// src/components/Products/ProductDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FiEdit, FiTrash2, FiChevronLeft, FiPackage, FiRefreshCw } from 'react-icons/fi';
