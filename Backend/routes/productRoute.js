@@ -13,10 +13,10 @@ import { validateProduct, validateSearch } from '../middleware/validation.js';
 const router = express.Router();
 
 router.get('/', getAllProducts);
-router.get('/:id', getProductById);
+
 router.post('/', authenticate, validateProduct, createProduct);
+router.get('/:id', getProductById);
 router.put('/:id', authenticate, validateProduct, updateProduct);
-router.get('/search', validateSearch, searchProducts);
-router.delete('/:id',authenticate, deleteProduct);
+router.delete('/:id', authenticate, deleteProduct);
 
 export default router;

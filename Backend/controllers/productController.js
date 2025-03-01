@@ -9,7 +9,11 @@ import SearchService from '../services/searchService.js';
 
 export const getAllProducts = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search } = req.query;
+    
+    if (search === 'true') {
+      return await searchProducts(req, res, next);
+    }
     
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
@@ -26,14 +30,15 @@ export const getAllProducts = async (req, res, next) => {
     
     res.status(200).json({
       success: true,
-      ...products
+      data: products.data,
+      pagination: products.pagination
     });
   } catch (error) {
     next(new DatabaseError(`Failed to retrieve products: ${error.message}`));
   }
 };
 
-export const getProductById = async (req, res,next) => {
+export const getProductById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const product = await Product.findById(id);
@@ -164,7 +169,8 @@ export const searchProducts = async (req, res, next) => {
       
       res.status(200).json({
         success: true,
-        ...result
+        data: result.data,
+        pagination: result.pagination
       });
     } catch (error) {
       next(new DatabaseError(`Failed to search products: ${error.message}`));

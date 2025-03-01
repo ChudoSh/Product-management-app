@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import productService from '../../services/productService';
+import Pagination from '../common/Pagination';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // Advanced filtering state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(10); 
+  
   const [filters, setFilters] = useState({
     text: '',
     minPrice: '',
@@ -18,7 +22,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [currentPage]); 
 
   const handleFilterChange = (field, value) => {
     setFilters({
@@ -30,11 +34,17 @@ const ProductList = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await productService.getAll();
       
-      // Handle different response formats
-      const productData = response.data?.data || response.data || [];
-      setProducts(Array.isArray(productData) ? productData : []);
+      setError('');
+      
+      const response = await productService.getAll(currentPage, limit);
+      
+      const productData = response.data?.data || [];
+      
+      setProducts(productData);
+      
+      const pagination = response.data?.pagination || {};
+      setTotalPages(Math.max(pagination.pages || 1, 1));
       
       setLoading(false);
     } catch (err) {
@@ -44,8 +54,11 @@ const ProductList = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   const applyFilters = () => {
-    // Convert filters to query parameters for the search API
     const queryParams = new URLSearchParams();
     
     if (filters.text) queryParams.append('q', filters.text);
@@ -54,18 +67,27 @@ const ProductList = () => {
     if (filters.id) queryParams.append('id', filters.id);
     if (filters.sort) queryParams.append('sort', filters.sort);
     
-    // Call search with the constructed query
+    queryParams.append('search', 'true');
+    
+    setCurrentPage(1);
+    
     fetchFilteredProducts(queryParams.toString());
   };
 
   const fetchFilteredProducts = async (queryString) => {
     try {
       setLoading(true);
-      const response = await productService.search(queryString);
       
-      // Handle different response formats
-      const productData = response.data?.data || response.data || [];
-      setProducts(Array.isArray(productData) ? productData : []);
+      const paginatedQueryString = `${queryString}&page=${currentPage}&limit=${limit}`;
+      
+      const response = await productService.search(paginatedQueryString);
+      
+      const productData = response.data?.data || [];
+      
+      setProducts(productData);
+      
+      const pagination = response.data?.pagination || {};
+      setTotalPages(Math.max(pagination.pages || 1, 1));
       
       setLoading(false);
     } catch (err) {
@@ -75,7 +97,6 @@ const ProductList = () => {
     }
   };
 
-  // Safe formatting function for price
   const formatPrice = (price) => {
     if (price == null) return '0.00';
     
@@ -88,7 +109,6 @@ const ProductList = () => {
     return '0.00';
   };
 
-  // Delete product handler
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) {
       return;
@@ -96,7 +116,7 @@ const ProductList = () => {
     
     try {
       await productService.delete(id);
-      fetchProducts(); // Refresh list after deletion
+      fetchProducts(); 
     } catch (err) {
       console.error('Failed to delete product:', err);
       alert('Error deleting product');
@@ -281,51 +301,60 @@ const ProductList = () => {
               No products available. Add a product to get started.
             </div>
           ) : (
-            <table style={{width: '100%', borderCollapse: 'collapse'}}>
-              <thead>
-                <tr style={{borderBottom: '1px solid #333'}}>
-                  <th style={{textAlign: 'left', padding: '10px'}}>ID</th>
-                  <th style={{textAlign: 'left', padding: '10px'}}>Name</th>
-                  <th style={{textAlign: 'left', padding: '10px'}}>Description</th>
-                  <th style={{textAlign: 'left', padding: '10px'}}>Price</th>
-                  <th style={{textAlign: 'right', padding: '10px'}}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product, index) => (
-                  <tr key={product.id || index} style={{borderBottom: '1px solid #333'}}>
-                    <td style={{padding: '10px'}}>{index + 1}#</td>
-                    <td style={{padding: '10px'}}>{product.name || 'Unnamed'}</td>
-                    <td style={{padding: '10px'}}>{product.description || 'No description'}</td>
-                    <td style={{padding: '10px'}}>${formatPrice(product.price)}</td>
-                    <td style={{padding: '10px', textAlign: 'right'}}>
-                      <button 
-                        onClick={() => handleDelete(product.id)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#ff6b6b',
-                          cursor: 'pointer',
-                          marginRight: '10px'
-                        }}
-                      >
-                        Delete
-                      </button>
-                      
-                      <Link 
-                        to={`/products/${product.id}/edit`} 
-                        style={{
-                          color: '#4d4dff',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        Edit
-                      </Link>
-                    </td>
+            <>
+              <table style={{width: '100%', borderCollapse: 'collapse'}}>
+                <thead>
+                  <tr style={{borderBottom: '1px solid #333'}}>
+                    <th style={{textAlign: 'left', padding: '10px'}}>ID</th>
+                    <th style={{textAlign: 'left', padding: '10px'}}>Name</th>
+                    <th style={{textAlign: 'left', padding: '10px'}}>Description</th>
+                    <th style={{textAlign: 'left', padding: '10px'}}>Price</th>
+                    <th style={{textAlign: 'right', padding: '10px'}}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {products.map((product, index) => (
+                    <tr key={product.id || index} style={{borderBottom: '1px solid #333'}}>
+                      <td style={{padding: '10px'}}>{index + 1}#</td>
+                      <td style={{padding: '10px'}}>{product.name || 'Unnamed'}</td>
+                      <td style={{padding: '10px'}}>{product.description || 'No description'}</td>
+                      <td style={{padding: '10px'}}>${formatPrice(product.price)}</td>
+                      <td style={{padding: '10px', textAlign: 'right'}}>
+                        <button 
+                          onClick={() => handleDelete(product.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#ff6b6b',
+                            cursor: 'pointer',
+                            marginRight: '10px'
+                          }}
+                        >
+                          Delete
+                        </button>
+                        
+                        <Link 
+                          to={`/products/${product.id}/edit`} 
+                          style={{
+                            color: '#4d4dff',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          Edit
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              
+              {/* Pagination component */}
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
           )}
         </div>
       )}

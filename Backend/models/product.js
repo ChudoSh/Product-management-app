@@ -42,7 +42,7 @@ class Product {
         const [products, _] = await queryPool(sql, [limit, offset]);
         
         const [countResult] = await queryPool('SELECT COUNT(*) as total FROM products');
-        const total = countResult.total;
+        const total = countResult[0].total;
         
         return {
             data: products.map(p => new Product(

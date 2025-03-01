@@ -1,17 +1,15 @@
-// src/services/productService.ts
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5001/api/products';
 
-// Helper to get the auth header
 const getAuthHeader = () => {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 const productService = {
-  getAll: async () => {
-    return await axios.get(API_URL, { 
+  getAll: async (page = 1, limit = 10) => {
+    return await axios.get(`${API_URL}?page=${page}&limit=${limit}`, { 
       headers: getAuthHeader() 
     });
   },
@@ -41,7 +39,7 @@ const productService = {
   },
   
   search: async (queryParams) => {
-    return await axios.get(`${API_URL}/search?${queryParams}`, { 
+    return await axios.get(`${API_URL}?${queryParams}`, { 
       headers: getAuthHeader() 
     });
   }

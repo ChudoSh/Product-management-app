@@ -61,8 +61,7 @@ class SearchService {
           total,
           pages: Math.ceil(total / parseInt(limit))
         }
-      };
-    } catch (error) {
+      }    } catch (error) {
       console.error('Search error:', error);
       throw new Error('Failed to search products');
     }
