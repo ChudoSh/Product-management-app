@@ -1,17 +1,14 @@
 import User from '../models/user.js';
 import { generateToken } from '../config/auth.js';
+import { ValidationError } from '../utils/errorHandler.js';
 
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-    
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered' });
+      return next(new ValidationError('Email already registered' ));
     }
     
     const user = await User.create(name, email, password);
@@ -33,18 +30,15 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
     
     const user = await User.findByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return next(new ValidationError('Invalid credentials'));
     }
     
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return next(new ValidationError('Invalid credentials'));
     }
     
     const token = generateToken(user.id);

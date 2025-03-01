@@ -1,5 +1,5 @@
 // services/searchService.js
-import { getCollection } from '../config/db/MongoDB.js';
+import { getCollection } from '../config/db/mongodbSetup.js';
 
 class SearchService {
   /**

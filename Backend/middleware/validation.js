@@ -1,3 +1,5 @@
+import { ValidationError } from "../utils/errorHandler";
+
 // Validate user registration
 export const validateUserRegistration = (req, res, next) => {
   const { name, email, password } = req.body;
@@ -29,7 +31,7 @@ export const validateUserRegistration = (req, res, next) => {
 
   // Return errors if any
   if (errors.length > 0) {
-    return res.status(400).json({ success: false, errors });
+    return new ValidationError('Invalid registration credentials',errors);
   }
 
   next();
@@ -66,7 +68,7 @@ export const validateProduct = (req, res, next) => {
 
   // Return errors if any
   if (errors.length > 0) {
-    return res.status(400).json({ success: false, errors });
+    throw new ValidationError('Invalid product data', errors);
   }
 
   next();
@@ -107,7 +109,34 @@ export const validateSearch = (req, res, next) => {
 
   // Return errors if any
   if (errors.length > 0) {
-    return res.status(400).json({ success: false, errors });
+    return new ValidationError('Invalid search parameters', errors);
+  }
+
+  next();
+};
+
+
+export const validateUserLogin = (req, res, next) => {
+  const { email, password } = req.body;
+  const errors = [];
+
+  // Email validation
+  if (!email || email.trim() === '') {
+    errors.push('Email is required');
+  } else {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errors.push('Invalid email format');
+    }
+  }
+
+  if (!password) {
+    errors.push('Password is required');
+  }
+
+  // Return errors if any
+  if (errors.length > 0) {
+    return new ValidationError('Invalid login credentials',errors);
   }
 
   next();
