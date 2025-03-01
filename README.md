@@ -15,5 +15,4 @@ The frontend service is written in TS using React and Vite libraries for API cal
 	`git clone https://github.com/yourusername/product-management.git cd product-management` 
 2. Start the application using Docker Compose:
     `docker-compose up --build`
-3. Access the application:
-    - Frontend: [http://localhost:5173](http://localhost:5173)
+3. Access the application: [http://localhost:5173](http://localhost:5173)
