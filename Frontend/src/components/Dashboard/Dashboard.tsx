@@ -1,12 +1,19 @@
+// src/components/Dashboard/Dashboard.tsx
 import React from "react";
 import { TopBar } from "./TopBar";
-import { Grid } from "./Grid";
+import { StatCards } from "./StatCards";
+import { ProductsChart } from "./ProductsChart";
+import  RecentProductsList  from "./RecentProductsList";
 
 export const Dashboard = () => {
   return (
     <div className="bg-white rounded-lg pb-4 shadow">
       <TopBar />
-      <Grid />
+      <div className="px-4 grid gap-3 grid-cols-12">
+        <StatCards />
+        <ProductsChart />
+        <RecentProductsList />
+      </div>
     </div>
   );
 };

@@ -1,198 +1,193 @@
-// src/components/Products/ProductList.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import productService from '../../services/productService';
-import { Product } from '../../types/Product';
 
 const ProductList = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage] = useState(10);
-  
-  // Advanced search filters
-  const [priceMin, setPriceMin] = useState('');
-  const [priceMax, setPriceMax] = useState('');
-  const [sortBy, setSortBy] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-
-  const fetchProducts = async (page = 1) => {
-    try {
-      const response = await productService.getAll(page, itemsPerPage);
-      setProducts(response.data.products);
-      setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-      setCurrentPage(page);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch products');
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async () => {
-    setLoading(true);
-    
-    try {
-      const queryParams = new URLSearchParams();
-      
-      if (searchQuery.trim()) {
-        queryParams.append('q', searchQuery);
-      }
-      
-      if (priceMin) {
-        queryParams.append('minPrice', priceMin);
-      }
-      
-      if (priceMax) {
-        queryParams.append('maxPrice', priceMax);
-      }
-      
-      if (sortBy) {
-        queryParams.append('sortBy', sortBy);
-      }
-      
-      const response = await productService.search(queryParams.toString());
-      setProducts(response.data);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setError('Search failed');
-      setLoading(false);
-    }
-  };
-
-  const handleReset = () => {
-    setSearchQuery('');
-    setPriceMin('');
-    setPriceMax('');
-    setSortBy('');
-    fetchProducts(1);
-  };
-
-  const changePage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    fetchProducts(page);
-  };
+  const [filterText, setFilterText] = useState('');
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await productService.getAll();
+      console.log('API Product response:', response.data);
+      
+      // Handle different response formats
+      const productData = response.data?.data || response.data || [];
+      setProducts(Array.isArray(productData) ? productData : []);
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+      setError('Failed to load products: ' + (err instanceof Error ? err.message : String(err)));
+      setLoading(false);
+    }
+  };
+
+  // Safe formatting function for price
+  const formatPrice = (price) => {
+    // Special case for null or undefined
+    if (price == null) return '0.00';
+    
+    // Convert string to number if needed
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    
+    // Check if conversion resulted in a valid number
+    if (typeof numPrice === 'number' && !isNaN(numPrice)) {
+      return numPrice.toFixed(2);
+    }
+    
+    // Fallback for any other case
+    return '0.00';
+  };
+
+  // Delete product handler
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+    
+    try {
+      await productService.delete(id);
+      fetchProducts(); // Refresh list after deletion
+    } catch (err) {
+      console.error('Failed to delete product:', err);
+      alert('Error deleting product');
+    }
+  };
 
   return (
-    <div className="product-list">
-      <h2>Products</h2>
+    <div style={{
+      color: 'white',
+      padding: '20px',
+      height: '100%',
+      overflow: 'auto'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        borderBottom: '1px solid #333',
+        paddingBottom: '10px'
+      }}>
+        <h1 style={{margin: 0}}>Welcome to product management console</h1>
+        <div>
+          <a href="/profile" style={{color: 'white', textDecoration: 'none'}}>Account</a>
+        </div>
+      </div>
       
-      <div className="search-section">
-        <div className="search-bar">
-          <input 
-            type="text" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products..."
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '20px',
+        gap: '10px'
+      }}>
+        <Link to="/products/new" style={{
+          background: 'transparent',
+          border: '1px solid #333',
+          padding: '8px 12px',
+          color: 'white',
+          textDecoration: 'none'
+        }}>
+          + Add product
+        </Link>
+        
+        <div style={{display: 'flex', flex: 1, alignItems: 'center'}}>
+          <span style={{marginRight: '10px'}}>Filter:</span>
+          <input
+            type="text"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            placeholder="text, price range, id, sort (price_asc, price_desc)"
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: '1px solid #333',
+              padding: '8px',
+              color: 'white'
+            }}
           />
-          <button onClick={handleSearch}>Search</button>
-          <button 
-            onClick={() => setShowFilters(!showFilters)} 
-            className="filter-btn"
-          >
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+        </div>
+      </div>
+      
+      {loading ? (
+        <div style={{textAlign: 'center', padding: '20px', color: '#aaa'}}>
+          Loading products...
+        </div>
+      ) : error ? (
+        <div style={{padding: '20px', color: '#ff6b6b'}}>
+          {error}
+          <button onClick={fetchProducts} style={{
+            background: 'none',
+            border: 'none',
+            color: '#4d4dff',
+            textDecoration: 'underline',
+            cursor: 'pointer',
+            marginLeft: '10px'
+          }}>
+            Try again
           </button>
         </div>
-        
-        {showFilters && (
-          <div className="advanced-filters">
-            <div className="filter-group">
-              <label>Min Price:</label>
-              <input 
-                type="number" 
-                value={priceMin} 
-                onChange={(e) => setPriceMin(e.target.value)}
-                placeholder="Minimum price" 
-              />
+      ) : (
+        <div>
+          {products.length === 0 ? (
+            <div style={{textAlign: 'center', padding: '20px', color: '#aaa'}}>
+              No products available. Add a product to get started.
             </div>
-            
-            <div className="filter-group">
-              <label>Max Price:</label>
-              <input 
-                type="number" 
-                value={priceMax} 
-                onChange={(e) => setPriceMax(e.target.value)}
-                placeholder="Maximum price" 
-              />
-            </div>
-            
-            <div className="filter-group">
-              <label>Sort By:</label>
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="">Default</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-                <option value="date_asc">Oldest First</option>
-                <option value="date_desc">Newest First</option>
-              </select>
-            </div>
-            
-            <div className="filter-actions">
-              <button onClick={handleSearch}>Apply Filters</button>
-              <button onClick={handleReset} className="reset-btn">Reset</button>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      <div className="product-header">
-        <Link to="/products/new" className="create-btn">Create New Product</Link>
-      </div>
-      
-      <div className="products-grid">
-        {products.length === 0 ? (
-          <p>No products found</p>
-        ) : (
-          products.map(product => (
-            <div key={product.id} className="product-card">
-              <h3>{product.name}</h3>
-              <p className="price">${product.price.toFixed(2)}</p>
-              <p className="description">{product.description?.substring(0, 100)}...</p>
-              <div className="product-actions">
-                <Link to={`/products/${product.id}`}>View</Link>
-                <Link to={`/products/${product.id}/edit`}>Edit</Link>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-      
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button 
-            onClick={() => changePage(currentPage - 1)} 
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          
-          <span className="page-info">
-            Page {currentPage} of {totalPages}
-          </span>
-          
-          <button 
-            onClick={() => changePage(currentPage + 1)} 
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+          ) : (
+            <table style={{width: '100%', borderCollapse: 'collapse'}}>
+              <thead>
+                <tr style={{borderBottom: '1px solid #333'}}>
+                  <th style={{textAlign: 'left', padding: '10px'}}>ID</th>
+                  <th style={{textAlign: 'left', padding: '10px'}}>Product</th>
+                  <th style={{textAlign: 'right', padding: '10px'}}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product, index) => (
+                  <tr key={product.id || index} style={{borderBottom: '1px solid #333'}}>
+                    <td style={{padding: '10px'}}>{index + 1}#</td>
+                    <td style={{padding: '10px'}}>
+                      Product: {product.name || 'Unnamed'}, 
+                      {product.description || 'No description'}, 
+                      ${formatPrice(product.price)}
+                    </td>
+                    <td style={{padding: '10px', textAlign: 'right'}}>
+                      <button 
+                        onClick={() => handleDelete(product.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#ff6b6b',
+                          cursor: 'pointer',
+                          marginRight: '10px'
+                        }}
+                      >
+                        Delete
+                      </button>
+                      
+                      <Link 
+                        to={`/products/${product.id}/edit`} 
+                        style={{
+                          color: '#4d4dff',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        Edit
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
     </div>

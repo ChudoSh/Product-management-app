@@ -1,25 +1,29 @@
-// src/components/layout/Sidebar.tsx
+// src/components/Sidebar/Sidebar.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import './Sidebar.css';
 
-const Sidebar = () => {
-  const { isAuthenticated } = useAuth();
+export const Sidebar = () => {
+  const { logout } = useAuth();
 
   return (
     <div className="sidebar">
-      <ul className="sidebar-nav">
-        <li><Link to="/products">All Products</Link></li>
-        {isAuthenticated && (
-          <>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/products/new">Add Product</Link></li>
-            <li><Link to="/profile">My Profile</Link></li>
-          </>
-        )}
-      </ul>
+      <div className="sidebar-header">
+        <h2>Product Manager</h2>
+      </div>
+      
+      <nav className="sidebar-nav">
+        <Link to="/products" className="sidebar-link active">
+          @Products
+        </Link>
+      </nav>
+      
+      <div className="sidebar-footer">
+        <button onClick={logout} className="logout-btn">
+          [•] Logout
+        </button>
+      </div>
     </div>
   );
 };
-
-export default Sidebar;

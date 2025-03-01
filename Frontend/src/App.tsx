@@ -1,108 +1,74 @@
 // src/App.tsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import  Sidebar  from './components/Sidebar/Sidebar';
-import { Dashboard } from './components/Dashboard/Dashboard';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Sidebar } from './components/Sidebar/Sidebar';
 import ProductList from './components/Products/ProductList';
-import ProductDetail from './components/Products/ProductDetails';
 import CreateProduct from './components/Products/CreateProduct';
-import UpdateProduct from './components/Products/UpdateProduct';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
-import Profile from './components/Auth/Profile';
-import './index.css';
-
-// PrivateRoute component for protected routes
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    return <Navigate to="/login" />;
-  }
-  return <>{children}</>;
-};
+import { AuthProvider } from './context/AuthContext';
+import { PrivateRoute } from './components/Auth/PrivateRoute';
+import './App.css';
+import UpdateProduct from './components/Products/UpdateProduct';
 
 function App() {
-  // Check if the route is an auth route (login/register)
-  const isAuthRoute = (pathname: string) => {
-    return pathname === '/login' || pathname === '/register';
-  };
-  
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-stone-100">
-        <Routes>
-          {/* Auth routes without sidebar */}
-          <Route path="/login" element={
-            <div className="flex items-center justify-center min-h-screen">
-              <Login />
-            </div>
-          } />
-          <Route path="/register" element={
-            <div className="flex items-center justify-center min-h-screen">
-              <Register />
-            </div>
-          } />
-          
-          {/* Main layout with sidebar */}
-          <Route path="/" element={
-            <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-              <Sidebar />
-              <Dashboard />
-            </main>
-          } />
-          
-          <Route path="/products" element={
-            <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-              <Sidebar />
-              <div className="bg-white rounded-lg pb-4 shadow">
-                <ProductList />
+    <AuthProvider>
+      <Router>
+        <div className="app">
+          <Routes>
+            {/* Auth routes */}
+            <Route path="/login" element={
+              <div className="auth-page">
+                <Login />
               </div>
-            </main>
-          } />
-          
-          <Route path="/products/new" element={
-            <PrivateRoute>
-              <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-                <Sidebar />
-                <div className="bg-white rounded-lg pb-4 shadow">
-                  <CreateProduct />
-                </div>
-              </main>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/products/:id" element={
-            <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-              <Sidebar />
-              <div className="bg-white rounded-lg pb-4 shadow">
-                <ProductDetail />
+            } />
+            <Route path="/register" element={
+              <div className="auth-page">
+                <Register />
               </div>
-            </main>
-          } />
-          
-          <Route path="/products/:id/edit" element={
-            <PrivateRoute>
-              <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-                <Sidebar />
-                <div className="bg-white rounded-lg pb-4 shadow">
-                  <UpdateProduct />
+            } />
+            
+            {/* Redirect root to products */}
+            <Route path="/" element={<Navigate to="/products" />} />
+            
+            {/* Product routes */}
+            <Route path="/products" element={
+              <PrivateRoute>
+                <div className="app-layout">
+                  <Sidebar />
+                  <div className="content">
+                    <ProductList />
+                  </div>
                 </div>
-              </main>
-            </PrivateRoute>
-          } />
-          
-          <Route path="/profile" element={
-            <PrivateRoute>
-              <main className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-                <Sidebar />
-                <div className="bg-white rounded-lg pb-4 shadow">
-                  <Profile />
+              </PrivateRoute>
+            } />
+            
+            <Route path="/products/new" element={
+              <PrivateRoute>
+                <div className="app-layout">
+                  <Sidebar />
+                  <div className="content">
+                    <CreateProduct />
+                  </div>
                 </div>
-              </main>
-            </PrivateRoute>
-          } />
-        </Routes>
-      </div>
-    </BrowserRouter>
+              </PrivateRoute>
+            } />
+            
+            <Route path="/products/:id/edit" element={
+              <PrivateRoute>
+                <div className="app-layout">
+                  <Sidebar />
+                  <div className="content">
+                    <UpdateProduct/>
+                  </div>
+                </div>
+              </PrivateRoute>
+            } />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

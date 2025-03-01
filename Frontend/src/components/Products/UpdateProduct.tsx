@@ -1,31 +1,28 @@
 // src/components/products/EditProduct.tsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import ProductForm from './ProductForm';
 import productService from '../../services/productService';
-import { Product } from '../../types/Product';
+import { FiRefreshCw } from 'react-icons/fi';
 
 const UpdateProduct = () => {
   const { id } = useParams<{ id: string }>();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!id) return;
+    
     const fetchProduct = async () => {
       try {
-        if (!id) return;
+        setLoading(true);
         const response = await productService.getById(id);
-        const product = response.data;
-        
-        setName(product.name);
-        setDescription(product.description || '');
-        setPrice(product.price.toString());
+        setProduct(response.data);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch product');
+        console.error('Failed to fetch product:', err);
+        setError('Failed to load product data');
         setLoading(false);
       }
     };
@@ -33,60 +30,46 @@ const UpdateProduct = () => {
     fetchProduct();
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
+  const handleUpdateProduct = async (productData: { name: string; description: string; price: number }) => {
     if (!id) return;
-    
-    try {
-      await productService.update(id, {
-        name,
-        description,
-        price: parseFloat(price)
-      });
-      navigate(`/products/${id}`);
-    } catch (err) {
-      setError('Failed to update product');
-    }
+    await productService.update(id, productData);
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-12">
+        <FiRefreshCw className="animate-spin text-2xl text-violet-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <div className="p-2 bg-red-100 text-red-700 text-sm rounded">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="p-4">
+        <div className="p-2 bg-yellow-100 text-yellow-700 text-sm rounded">
+          Product not found
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="edit-product">
-      <h2>Edit Product</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Name</label>
-          <input 
-            type="text" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            required 
-          />
-        </div>
-        <div className="form-group">
-          <label>Description</label>
-          <textarea 
-            value={description} 
-            onChange={(e) => setDescription(e.target.value)} 
-          />
-        </div>
-        <div className="form-group">
-          <label>Price</label>
-          <input 
-            type="number" 
-            step="0.01" 
-            value={price} 
-            onChange={(e) => setPrice(e.target.value)} 
-            required 
-          />
-        </div>
-        <button type="submit" className="btn save-btn">Save Changes</button>
-      </form>
-    </div>
+    <ProductForm
+      initialData={product}
+      onSubmit={handleUpdateProduct}
+      title="Edit Product"
+      submitButtonText="Save Changes"
+    />
   );
 };
 

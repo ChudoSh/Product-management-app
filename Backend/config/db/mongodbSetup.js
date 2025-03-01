@@ -17,7 +17,7 @@ const initializeMongo = async () => {
     // Create collections and indexes in one operation
     await setupCollections(db);
     
-    console.log('MongoDB initialized: connected and indexes created');
+    console.log('MongoDB initialized: connected and indexes created in collection:',dbName);
     return db;
   } catch (error) {
     console.error('MongoDB initialization error:', error);

@@ -86,11 +86,11 @@ class Product {
         // Insert into MySQL
         const sql = 'INSERT INTO products (name, description, price) VALUES (?, ?, ?)';
         const result = await queryPool(sql, [name, description, price]);
-        const id = result.insertId;
+        const id = result[0].insertId;
         
         // Get the created product with timestamps
         const product = await this.findById(id);
-        
+
         // Sync with MongoDB for search
         await this.syncToMongoDB(product);
         
@@ -131,7 +131,7 @@ class Product {
             price: product.price,
             created_at: product.created_at,
         };
-        
+       
         // Upsert - update if exists, insert if not
         await collection.updateOne(
             { product_id: product.id },

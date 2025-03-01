@@ -1,6 +1,9 @@
+// src/components/Sidebar/CommandMenu.tsx
 import { Command } from "cmdk";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FiEye, FiLink, FiLogOut, FiPhone, FiPlus } from "react-icons/fi";
+import {  FiLogOut, FiPhone, FiPlus, FiPackage, FiUser } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export const CommandMenu = ({
   open,
@@ -10,6 +13,8 @@ export const CommandMenu = ({
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [value, setValue] = useState("");
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Toggle the menu when ⌘K is pressed
   useEffect(() => {
@@ -22,14 +27,25 @@ export const CommandMenu = ({
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [setOpen]);
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setOpen(false);
+    navigate('/login');
+  };
 
   return (
     <Command.Dialog
       open={open}
       onOpenChange={setOpen}
       label="Global Command Menu"
-      className="fixed inset-0 bg-stone-950/50"
+      className="fixed inset-0 bg-stone-950/50 z-50"
       onClick={() => setOpen(false)}
     >
       <div
@@ -48,32 +64,44 @@ export const CommandMenu = ({
             <span className="text-violet-500">"{value}"</span>
           </Command.Empty>
 
-          <Command.Group heading="Team" className="text-sm mb-3 text-stone-400">
-            <Command.Item className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2">
-              <FiPlus />
-              Invite Member
+          <Command.Group heading="Products" className="text-sm mb-3 text-stone-400">
+            <Command.Item 
+              className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2"
+              onSelect={() => handleNavigation('/products')}
+            >
+              <FiPackage />
+              View All Products
             </Command.Item>
-            <Command.Item className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2">
-              <FiEye />
-              See Org Chart
+            <Command.Item 
+              className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2"
+              onSelect={() => handleNavigation('/products/new')}
+            >
+              <FiPlus />
+              Add New Product
             </Command.Item>
           </Command.Group>
 
-          <Command.Group
-            heading="Integrations"
-            className="text-sm text-stone-400 mb-3"
-          >
-            <Command.Item className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2">
-              <FiLink />
-              Link Services
+          <Command.Group heading="Account" className="text-sm text-stone-400 mb-3">
+            <Command.Item 
+              className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2"
+              onSelect={() => handleNavigation('/profile')}
+            >
+              <FiUser />
+              View Profile
             </Command.Item>
-            <Command.Item className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2">
+            <Command.Item 
+              className="flex cursor-pointer transition-colors p-2 text-sm text-stone-950 hover:bg-stone-200 rounded items-center gap-2"
+              onSelect={() => handleNavigation('/support')}
+            >
               <FiPhone />
               Contact Support
             </Command.Item>
           </Command.Group>
 
-          <Command.Item className="flex cursor-pointer transition-colors p-2 text-sm text-stone-50 hover:bg-stone-700 bg-stone-950 rounded items-center gap-2">
+          <Command.Item 
+            className="flex cursor-pointer transition-colors p-2 text-sm text-stone-50 hover:bg-stone-700 bg-stone-950 rounded items-center gap-2"
+            onSelect={handleLogout}
+          >
             <FiLogOut />
             Sign Out
           </Command.Item>

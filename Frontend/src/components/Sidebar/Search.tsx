@@ -1,5 +1,4 @@
-"use client";
-
+// src/components/Sidebar/Search.tsx
 import React, { useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import { CommandMenu } from "./CommandMenu";
@@ -8,7 +7,7 @@ export const Search = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <div className="h-[calc(100vh-2rem)] overflow-y-auto">
       <div className="bg-stone-200 mb-4 relative rounded flex items-center px-2 py-1.5 text-sm">
         <FiSearch className="mr-2" />
         <input
@@ -27,6 +26,6 @@ export const Search = () => {
       </div>
 
       <CommandMenu open={open} setOpen={setOpen} />
-    </>
+    </div>
   );
 };

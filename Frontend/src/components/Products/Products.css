@@ -1,0 +1,35 @@
+/* Add to src/components/Products/Products.css */
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+  }
+  
+  .product-table th {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .product-table td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .actions-cell {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .edit-btn, .delete-btn {
+    background: transparent;
+    border: none;
+    color: #4d4dff;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+  
+  .delete-btn {
+    color: #ff6b6b;
+  }

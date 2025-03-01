@@ -2,7 +2,7 @@
 import axios, { AxiosResponse } from 'axios';
 import {User} from '../types/User'; 
 
-const API_URL = 'http://localhost:6000/api/users';
+const API_URL = 'http://localhost:5001/api/users';
 
 const userService = {
   // Register new user

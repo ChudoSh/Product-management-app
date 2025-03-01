@@ -4,8 +4,8 @@ import { IconType } from "react-icons";
 import { Link, useLocation } from "react-router-dom";
 import {
   FiHome,
-  FiPackage, // For products
-  FiUser // For profile
+  FiPackage,
+  FiUser
 } from "react-icons/fi";
 
 export const RouteSelect = () => {
@@ -28,7 +28,7 @@ export const RouteSelect = () => {
       />
       <Route 
         Icon={FiUser} 
-        selected={currentPath === '/profile'} 
+        selected={currentPath.includes('/profile')} 
         title="Profile" 
         path="/profile" 
       />
