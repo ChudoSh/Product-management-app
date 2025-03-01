@@ -1,16 +1,21 @@
 // src/components/Dashboard/TopBar.tsx
+import React from "react";
 import { FiCalendar } from "react-icons/fi";
 
 export const TopBar = () => {
-  const dateNow = new Date().toLocaleDateString();
-  
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <div className="border-b px-4 mb-4 mt-2 pb-4 border-stone-200">
       <div className="flex items-center justify-between p-0.5">
         <div>
           <span className="text-sm font-bold block">🚀 Good morning, Bar!</span>
           <span className="text-xs block text-stone-500">
-            {dateNow}
+            {formattedDate}
           </span>
         </div>
 

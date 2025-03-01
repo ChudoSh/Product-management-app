@@ -18,6 +18,7 @@ const Register = () => {
       await userService.register(name, email, password);
       navigate('/login');
     } catch (err) {
+      console.log(err);
       setError('Registration failed. Please try again.');
     }
   };

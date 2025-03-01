@@ -1,7 +1,7 @@
 // src/components/layout/MainLayout.tsx
 import React, { ReactNode } from 'react';
 import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import Sidebar from '../Sidebar/Sidebar';
 
 interface MainLayoutProps {
   children: ReactNode;

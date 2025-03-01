@@ -29,6 +29,7 @@ const ProductList = () => {
       setCurrentPage(page);
       setLoading(false);
     } catch (err) {
+      console.error(err);
       setError('Failed to fetch products');
       setLoading(false);
     }
@@ -38,7 +39,7 @@ const ProductList = () => {
     setLoading(true);
     
     try {
-      let queryParams = new URLSearchParams();
+      const queryParams = new URLSearchParams();
       
       if (searchQuery.trim()) {
         queryParams.append('q', searchQuery);
@@ -60,6 +61,7 @@ const ProductList = () => {
       setProducts(response.data);
       setLoading(false);
     } catch (err) {
+      console.error(err);
       setError('Search failed');
       setLoading(false);
     }

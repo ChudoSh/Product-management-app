@@ -1,16 +1,37 @@
+// src/components/Sidebar/RouteSelect.tsx
+import React from "react";
 import { IconType } from "react-icons";
-import {FiHome} from "react-icons/fi";
-import { Gi3dGlasses } from "react-icons/gi";
-import { RiStockLine } from "react-icons/ri";
-import { Link } from 'react-router-dom';
-
+import { Link, useLocation } from "react-router-dom";
+import {
+  FiHome,
+  FiPackage, // For products
+  FiUser // For profile
+} from "react-icons/fi";
 
 export const RouteSelect = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
   return (
     <div className="space-y-1">
-      <Route Icon={FiHome} selected={true} title="Dashboard" path="/" />
-      <Route Icon={RiStockLine} selected={false} title="Strategies" path="/strategies" />
-      <Route Icon={Gi3dGlasses} selected={false} title="Agents" path="/agents" />
+      <Route 
+        Icon={FiHome} 
+        selected={currentPath === '/'} 
+        title="Dashboard" 
+        path="/" 
+      />
+      <Route 
+        Icon={FiPackage} 
+        selected={currentPath.includes('/products')} 
+        title="Products" 
+        path="/products" 
+      />
+      <Route 
+        Icon={FiUser} 
+        selected={currentPath === '/profile'} 
+        title="Profile" 
+        path="/profile" 
+      />
     </div>
   );
 };
@@ -19,7 +40,7 @@ const Route = ({
   selected,
   Icon,
   title,
-  path, // Add path prop
+  path,
 }: {
   selected: boolean;
   Icon: IconType;
@@ -27,7 +48,7 @@ const Route = ({
   path: string;
 }) => {
   return (
-    <Link to={path}>
+    <Link to={path} className="block">
       <button
         className={`flex items-center justify-start gap-2 w-full rounded px-2 py-1.5 text-sm transition-[box-shadow,_background-color,_color] ${
           selected
