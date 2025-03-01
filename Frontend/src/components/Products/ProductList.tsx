@@ -6,17 +6,31 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filterText, setFilterText] = useState('');
+  
+  // Advanced filtering state
+  const [filters, setFilters] = useState({
+    text: '',
+    minPrice: '',
+    maxPrice: '',
+    id: '',
+    sort: ''
+  });
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  const handleFilterChange = (field, value) => {
+    setFilters({
+      ...filters,
+      [field]: value
+    });
+  };
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
       const response = await productService.getAll();
-      console.log('API Product response:', response.data);
       
       // Handle different response formats
       const productData = response.data?.data || response.data || [];
@@ -30,20 +44,47 @@ const ProductList = () => {
     }
   };
 
+  const applyFilters = () => {
+    // Convert filters to query parameters for the search API
+    const queryParams = new URLSearchParams();
+    
+    if (filters.text) queryParams.append('q', filters.text);
+    if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
+    if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
+    if (filters.id) queryParams.append('id', filters.id);
+    if (filters.sort) queryParams.append('sort', filters.sort);
+    
+    // Call search with the constructed query
+    fetchFilteredProducts(queryParams.toString());
+  };
+
+  const fetchFilteredProducts = async (queryString) => {
+    try {
+      setLoading(true);
+      const response = await productService.search(queryString);
+      
+      // Handle different response formats
+      const productData = response.data?.data || response.data || [];
+      setProducts(Array.isArray(productData) ? productData : []);
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Filter search error:', err);
+      setError('Failed to search products: ' + (err instanceof Error ? err.message : String(err)));
+      setLoading(false);
+    }
+  };
+
   // Safe formatting function for price
   const formatPrice = (price) => {
-    // Special case for null or undefined
     if (price == null) return '0.00';
     
-    // Convert string to number if needed
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     
-    // Check if conversion resulted in a valid number
     if (typeof numPrice === 'number' && !isNaN(numPrice)) {
       return numPrice.toFixed(2);
     }
     
-    // Fallback for any other case
     return '0.00';
   };
 
@@ -98,22 +139,120 @@ const ProductList = () => {
         }}>
           + Add product
         </Link>
+      </div>
+      
+      {/* Advanced filtering system */}
+      <div style={{
+        marginBottom: '20px',
+        padding: '15px',
+        border: '1px solid #333',
+        borderRadius: '4px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '10px',
+          gap: '10px',
+          flexWrap: 'wrap'
+        }}>
+          <label style={{minWidth: '80px'}}>Filter by:</label>
+          
+          <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+            <span>Text:</span>
+            <input
+              type="text"
+              value={filters.text}
+              onChange={(e) => handleFilterChange('text', e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #333',
+                padding: '6px',
+                color: 'white',
+                width: '150px'
+              }}
+            />
+          </div>
+          
+          <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+            <span>Price from:</span>
+            <input
+              type="number"
+              value={filters.minPrice}
+              onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #333',
+                padding: '6px',
+                color: 'white',
+                width: '80px'
+              }}
+            />
+            <span>to:</span>
+            <input
+              type="number"
+              value={filters.maxPrice}
+              onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #333',
+                padding: '6px',
+                color: 'white',
+                width: '80px'
+              }}
+            />
+          </div>
+          
+          <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+            <span>ID:</span>
+            <input
+              type="text"
+              value={filters.id}
+              onChange={(e) => handleFilterChange('id', e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #333',
+                padding: '6px',
+                color: 'white',
+                width: '80px'
+              }}
+            />
+          </div>
+          
+          <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+            <span>Sort by:</span>
+            <select
+              value={filters.sort}
+              onChange={(e) => handleFilterChange('sort', e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #333',
+                padding: '6px',
+                color: 'white',
+                width: '120px'
+              }}
+            >
+              <option value="">Default</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="date_asc">Date: Oldest First</option>
+              <option value="date_desc">Date: Newest First</option>
+            </select>
+          </div>
+        </div>
         
-        <div style={{display: 'flex', flex: 1, alignItems: 'center'}}>
-          <span style={{marginRight: '10px'}}>Filter:</span>
-          <input
-            type="text"
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            placeholder="text, price range, id, sort (price_asc, price_desc)"
+        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+          <button
+            onClick={applyFilters}
             style={{
-              flex: 1,
               background: 'transparent',
               border: '1px solid #333',
-              padding: '8px',
-              color: 'white'
+              padding: '6px 12px',
+              color: 'white',
+              cursor: 'pointer'
             }}
-          />
+          >
+            Apply Filters
+          </button>
         </div>
       </div>
       
@@ -146,7 +285,9 @@ const ProductList = () => {
               <thead>
                 <tr style={{borderBottom: '1px solid #333'}}>
                   <th style={{textAlign: 'left', padding: '10px'}}>ID</th>
-                  <th style={{textAlign: 'left', padding: '10px'}}>Product</th>
+                  <th style={{textAlign: 'left', padding: '10px'}}>Name</th>
+                  <th style={{textAlign: 'left', padding: '10px'}}>Description</th>
+                  <th style={{textAlign: 'left', padding: '10px'}}>Price</th>
                   <th style={{textAlign: 'right', padding: '10px'}}>Actions</th>
                 </tr>
               </thead>
@@ -154,11 +295,9 @@ const ProductList = () => {
                 {products.map((product, index) => (
                   <tr key={product.id || index} style={{borderBottom: '1px solid #333'}}>
                     <td style={{padding: '10px'}}>{index + 1}#</td>
-                    <td style={{padding: '10px'}}>
-                      Product: {product.name || 'Unnamed'}, 
-                      {product.description || 'No description'}, 
-                      ${formatPrice(product.price)}
-                    </td>
+                    <td style={{padding: '10px'}}>{product.name || 'Unnamed'}</td>
+                    <td style={{padding: '10px'}}>{product.description || 'No description'}</td>
+                    <td style={{padding: '10px'}}>${formatPrice(product.price)}</td>
                     <td style={{padding: '10px', textAlign: 'right'}}>
                       <button 
                         onClick={() => handleDelete(product.id)}

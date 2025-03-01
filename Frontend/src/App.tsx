@@ -10,6 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 import { PrivateRoute } from './components/Auth/PrivateRoute';
 import './App.css';
 import UpdateProduct from './components/Products/UpdateProduct';
+import Profile from './components/Auth/Profile'
 
 function App() {
   return (
@@ -27,6 +28,17 @@ function App() {
               <div className="auth-page">
                 <Register />
               </div>
+            } />
+
+            <Route path="/profile" element={
+              <PrivateRoute>
+                <main className='app=layout'>
+                  <Sidebar />
+                  <div className="content">
+                    <Profile />
+                  </div>
+                  </main>
+              </PrivateRoute>
             } />
             
             {/* Redirect root to products */}
