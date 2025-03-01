@@ -1,4 +1,3 @@
-// Modify Backend/server.js to include error handling
 
 import express from 'express';
 import cors from 'cors';
@@ -9,13 +8,13 @@ import { initializeMySql } from './config/db/mysqlSetup.js';
 import { initializeMongo } from './config/db/mongodbSetup.js';
 import { errorHandler } from './utils/errorHandler.js';
 import { NotFoundError } from './utils/errorHandler.js';
+import { insertMockProducts } from './utils/mockData.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
 
-// Middleware
 app.use(cors({
   origin: 'http://localhost:5173', 
   credentials: true
@@ -23,24 +22,22 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 
-// Handle undefined routes
 app.use((req, res, next) => {
   const error = new Error(`Not found - ${req.originalUrl}`);
   error.statusCode = 404;
   next(error);
 });
 
-// Global error handling middleware
 app.use(errorHandler);
 
 const startServer = async () => {
   try {
     await initializeMySql();
     await initializeMongo(); 
+    await insertMockProducts();
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

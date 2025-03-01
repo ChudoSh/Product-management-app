@@ -1,6 +1,3 @@
-// Backend/utils/errorHandler.js
-
-// Base application error class
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -10,7 +7,6 @@ class AppError extends Error {
   }
 }
 
-// Common error types
 class ValidationError extends AppError {
   constructor(message) {
     super(message, 400);
@@ -35,19 +31,15 @@ class DatabaseError extends AppError {
   }
 }
 
-// Error handling middleware
 const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   
-  // Log error for server-side debugging
   console.error(`Error [${statusCode}]: ${err.message}`);
   if (statusCode === 500) console.error(err.stack);
   
-  // Send response to client
   res.status(statusCode).json({
     success: false,
     message: err.message,
-    // Include additional details if available
     errors: err.errors || undefined
   });
 };

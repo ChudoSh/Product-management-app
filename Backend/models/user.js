@@ -1,4 +1,3 @@
-// models/user.js
 import bcrypt from 'bcrypt';
 import { queryPool } from '../config/db/mysqlSetup.js';
 

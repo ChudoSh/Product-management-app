@@ -1,4 +1,3 @@
-// middleware/auth.js
 import { verifyToken } from '../config/auth.js';
 import User from '../models/user.js';
 

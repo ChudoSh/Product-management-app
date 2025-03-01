@@ -5,10 +5,7 @@
   "type": "module",
   "main": "main.tsx",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "start": "vite"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.9",

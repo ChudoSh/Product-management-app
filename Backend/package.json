@@ -5,7 +5,6 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "npm run test",
     "start": "node server.js"
   },
   "repository": {

@@ -1,4 +1,3 @@
-// controllers/productController.js
 import Product from '../models/product.js';
 import { getCollection } from '../config/db/mongodbSetup.js';
 import { 
@@ -8,12 +7,10 @@ import {
 } from '../utils/errorHandler.js';
 import SearchService from '../services/searchService.js';
 
-// Get all products
 export const getAllProducts = async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     
-    // Validate pagination parameters
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     
@@ -36,7 +33,7 @@ export const getAllProducts = async (req, res, next) => {
   }
 };
 
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res,next) => {
     try {
         const { id } = req.params;
         const product = await Product.findById(id);
@@ -50,20 +47,14 @@ export const getProductById = async (req, res) => {
             product: product.toJSON()
         });
     } catch (error) {
-        console.error('Error fetching product:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to retrieve product' 
-        });
+      next(new DatabaseError(`Failed to create product: ${error.message}`));
     }
 }
 
-// Create a new product
 export const createProduct = async (req, res, next) => {
   try {
     const { name, description, price } = req.body;
     
-    // Input validation (supplementing middleware validation)
     if (!name || !description || price === undefined) {
       return next(new ValidationError('Name, description, and price are required'));
     }
@@ -85,19 +76,16 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
-// Update a product
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, description, price } = req.body;
     
-    // Get existing product
     const product = await Product.findById(id);
     if (!product) {
       return next(new NotFoundError('Product'));
     }
     
-    // Update fields if provided
     if (name) product.name = name;
     if (description) product.description = description;
     
@@ -109,7 +97,6 @@ export const updateProduct = async (req, res, next) => {
       product.price = priceValue;
     }
     
-    // Save updates
     await product.update();
     
     res.status(200).json({
@@ -122,18 +109,15 @@ export const updateProduct = async (req, res, next) => {
   }
 };
 
-// Delete a product
 export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     
-    // Check if product exists
     const product = await Product.findById(id);
     if (!product) {
       return next(new NotFoundError('Product'));
     }
     
-    // Delete product
     await Product.delete(id);
     
     res.status(200).json({
@@ -145,13 +129,11 @@ export const deleteProduct = async (req, res, next) => {
   }
 };
 
-// Search products using MongoDB
 export const searchProducts = async (req, res, next) => {
     try {
       const { q, minPrice, maxPrice, sort } = req.query;
       const { page = 1, limit = 10 } = req.query;
       
-      // Validate pagination parameters
       const pageNum = parseInt(page);
       const limitNum = parseInt(limit);
       
@@ -163,7 +145,6 @@ export const searchProducts = async (req, res, next) => {
         return next(new ValidationError('Limit must be between 1 and 100'));
       }
       
-      // Validate price parameters if provided
       if (minPrice !== undefined) {
         const minPriceValue = parseFloat(minPrice);
         if (isNaN(minPriceValue) || minPriceValue < 0) {
@@ -178,7 +159,6 @@ export const searchProducts = async (req, res, next) => {
         }
       }
       
-      // Use the SearchService to handle the search logic
       const filters = { q, minPrice, maxPrice, sort };
       const result = await SearchService.searchProducts(filters, pageNum, limitNum);
       
