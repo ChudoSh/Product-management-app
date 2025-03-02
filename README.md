@@ -7,7 +7,6 @@ The frontend service is written in TS using React and Vite libraries for API cal
 ### Prerequistes
 - Git 
 -  Docker and the docker-compose file
-- npm or yarn (for local development)
 
 ### Running the app
 
