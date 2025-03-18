@@ -37,8 +37,9 @@ Client → Express → Router → Controller → Model → MySQL/MongoDB
 
 1. Clone the repository
 2. Create `.env` file with required configurations
-3. Run `docker-compose up --build`
-4. Access at `http://localhost:5001`
+3. Contact me to obtain the docker-compose file
+4. Run `docker-compose up --build`
+5. Access at `http://localhost:5001`
 
 ### Environment Variables
 
